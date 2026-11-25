@@ -97,7 +97,24 @@
   }
   input.box:focus { background: #eaf4e4; border-style: solid; }
   input.box.ok { background: #d9f2d0; border-color: #2f6f3e; border-style: solid; }
-  input.box.bad { background: #fbd9d6; border-color: #c0392b; border-style: solid; }
+  input.box.bad {
+    background: #fbd9d6; border-color: #c0392b; border-style: solid;
+    color: #a33; text-decoration: line-through; text-decoration-color: #c0392b;
+  }
+
+  /* poprawna litera pokazywana po sprawdzeniu przy błędnym okienku */
+  .slot { position: relative; display: inline-flex; }
+  .fix {
+    display: none;
+    position: absolute; top: -2.6mm; right: -2.6mm;
+    width: 7mm; height: 7mm; border-radius: 50%;
+    background: #2f6f3e; color: #fff; border: 1.5px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    align-items: center; justify-content: center;
+    font-size: 12pt; font-weight: 700; line-height: 1;
+    pointer-events: none;
+  }
+  input.box.bad + .fix { display: flex; }
   .row.done .num { background: #d9f2d0; }
 
   /* rozwiązanie */
@@ -110,6 +127,7 @@
     .toolbar { display: none; }
     .page { margin: 0; box-shadow: none; }
     input.box { border-style: solid; border-color: #333; background: #fff !important; }
+    .fix { display: none !important; }
   }
 </style>
 </head>
@@ -229,7 +247,17 @@ function render(data) {
         b.classList.add("given");
       }
       b.classList.add("box");
-      w.appendChild(b);
+      if (blank.has(i)) {
+        const slot = document.createElement("span");
+        slot.className = "slot";
+        const fix = document.createElement("span");
+        fix.className = "fix";
+        fix.textContent = ch;
+        slot.append(b, fix);
+        w.appendChild(slot);
+      } else {
+        w.appendChild(b);
+      }
     });
     row.appendChild(w);
     rows.appendChild(row);
